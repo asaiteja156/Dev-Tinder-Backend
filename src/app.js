@@ -1,21 +1,33 @@
 const express = require('express');
 const app = express();
+const connectDB = require("./config/database");
+const User = require("./models/user");
 
-// app.use("/",(req, res) => {
-//     console.log('This is a middleware function');
-//     res.send('<h1>Hello World</h1>');
-// });
+// Post API - SignUp
+app.post('/signup', async (req, res) => {
+    // Creating a new instance of the User model
+    const user = new User({
+        firstName: "Virat",
+        lastName: "Kohli",
+        emailId: "vk@gmail.coom",
+        password: "vk@123",
+    });
 
-app.use("/about",(req, res) => {
-    console.log('This is a middleware function');
-    res.send('<h1>About Us</h1>');
+    try{
+        await user.save();    // Save the user to the database - returns a Promise
+        res.send("User created successfully");
+    } catch(err) {
+        res.status(400).send("Error creating the user" + err.message);
+    }
 });
 
-app.use("/",(req, res) => {
-    console.log('This is a middleware function');
-    res.send('<h1>Hello World</h1>');
-});
-
-app.listen((3000), () => {;
-    console.log('Server running on port 3000')
+connectDB()
+.then(() => {
+  console.log("Connected to the devTinder database");
+  app.listen((3000), () => {;
+    console.log('Server running & Listening on port 3000')
+    });
+})
+.catch((err) => {
+  console.log("Error connecting to the database", err);
 });
