@@ -1,0 +1,5 @@
+
+
+const validateSignupData = () => {
+    // validate data
+}

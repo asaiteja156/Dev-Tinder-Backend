@@ -7,7 +7,7 @@ app.use(express.json());    // Middleware to parse the request body
 
 // Post API - SignUp
 app.post('/signup', async (req, res) => {
-
+    
     // Creating a new instance of the User model
     const user = new User(req.body);
 
@@ -67,7 +67,19 @@ app.patch('/user', async (req, res) => {
     const userId = req.body.userId;
     const data = req.body;
     try{
-        await User.findByIdAndUpdate({_id: userId}, data);
+        const ALLOWED_UPDATES = ["photoUrl", "about", "skills", "age", "gender"];
+        const isAllowedUpdates = Object.keys(data).every((update) => ALLOWED_UPDATES.includes(update));
+
+        if(!isAllowedUpdates){
+            return res.status(400).send("Invalid updates");
+        }
+
+        if(data?.skills.length > 10){
+            return res.status(400).send("Skills should be less than 10");
+        }    
+
+        const user = await User.findByIdAndUpdate({_id: userId}, data, {returnDocument: 'after', runValidators: true});
+        console.log(user);
         res.send("User updated successfully");
     }     
     catch(err){
